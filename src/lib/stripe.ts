@@ -1,9 +1,20 @@
 import Stripe from 'stripe';
 import { Plan } from '@/types';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+      apiVersion: '2026-01-28.clover',
+    });
+  }
+  return _stripe;
+}
+
+export const stripe = typeof process !== 'undefined' && process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-01-28.clover' })
+  : (null as unknown as Stripe);
 
 export const STRIPE_PRICES: Record<Exclude<Plan, 'free'>, string> = {
   starter: process.env.STRIPE_STARTER_PRICE_ID || '',
